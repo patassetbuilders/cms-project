@@ -6,6 +6,5 @@ require "pry"
 require "pry-byebug"
 
 get "/" do
-  binding.pry
-  "Getting Started"
+  erb :home
 end
