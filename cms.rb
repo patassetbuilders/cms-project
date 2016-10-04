@@ -15,3 +15,9 @@ get "/" do
   end 
   erb :index
 end
+
+get "/read_file/:file_name" do
+  file = root + "/data/" + params[:file_name]
+  @file_contents = File.read(file)  #beware of long files
+  erb :show_file
+end
