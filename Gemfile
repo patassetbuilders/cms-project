@@ -12,4 +12,7 @@ end
 group :development do
   gem "pry"
   gem 'pry-byebug'
+  gem 'minitest'
+  gem 'minitest-reporters'
+  gem 'simplecov'
 end
