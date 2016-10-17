@@ -2,11 +2,11 @@ require "sinatra"
 require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
+require "redcarpet"
 require "pry"
 require "pry-byebug"
 
 #blogg http://cms-project.blogspot.com.au/
-
 
 configure do
   enable :sessions
@@ -23,7 +23,7 @@ end
 
 get "/read_file/:file_name" do
   if cms_contents.include? params[:file_name]
-    file = root + "/data/" + params[:file_name]
+    file_path = root + "/data/" + params[:file_name]
     @file_contents = File.read(file)  #beware of long files
     erb :show_file
   else

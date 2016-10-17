@@ -30,6 +30,7 @@ class AppTest < Minitest::Test
   
   def test_document_not_found
     get "/notafile.ext"
+    binding.pry
     
     assert_equal 302, last_response.status
     
