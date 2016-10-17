@@ -1,3 +1,7 @@
+<% if session[:message] %>
+  <p><%= session.delete(:message) %></p>
+<% end %>
+
 <p>Files in the data folder</p>
 <% @contents.each do |file_name| %>
   <a href="read_file/<%= file_name %>"><%= file_name %></a>

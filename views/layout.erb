@@ -14,6 +14,9 @@
   <body>
     <header>
       <h4>CMS Project</h4>
+      <% if session[:message] %>
+        <p> <%= session[:message] %> </p>
+      <% end %>
       <div class="actions">
         <%= yield_content :header_links %>
       </div>
