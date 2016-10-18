@@ -19,6 +19,7 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, "about.txt"
     assert_includes last_response.body, "changes.txt"
     assert_includes last_response.body, "history.txt"
+    assert_includes last_response.body, "markdown.md"
   end
   
   def test_content_of_changes_document
