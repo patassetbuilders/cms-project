@@ -1,10 +1,9 @@
 <% if session[:message] %>
   <p><%= session.delete(:message) %></p>
-  <% binding.pry %>
 <% end %>
 
 <p>Files in the data folder</p>
 <% @contents.each do |file_name| %>
-  <a href="read_file/<%= file_name %>"><%= file_name %></a>
+  <a href="<%= file_name %>"><%= file_name %></a>
   <br />
 <% end %>

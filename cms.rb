@@ -21,10 +21,10 @@ get "/" do
   erb :index
 end
 
-get "/read_file/:file_name" do
+get "/:file_name" do
   if cms_contents.include? params[:file_name]
     file_path = root + "/data/" + params[:file_name]
-    @file_contents = File.read(file)  #beware of long files
+    @file_contents = File.read(file_path)  #beware of long files
     erb :show_file
   else
     session[:message] = "#{params[:file_name]} does not exist."

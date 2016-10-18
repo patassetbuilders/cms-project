@@ -22,7 +22,7 @@ class AppTest < Minitest::Test
   end
   
   def test_content_of_changes_document
-    get '/read_file/changes.txt'
+    get '/changes.txt'
     assert_equal 200, last_response.status
     assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
     assert_includes last_response.body, "Showing the contemts of changes.txt"
@@ -30,13 +30,12 @@ class AppTest < Minitest::Test
   
   def test_document_not_found
     get "/notafile.ext"
-    binding.pry
     
     assert_equal 302, last_response.status
     
     get last_response["Location"]
-    
+
     assert_equal 200, last_response.status
-    assert_includes last_response.body, "/notafile.ext does not exist."
+    assert_includes last_response.body, "notafile.ext does not exist"
   end
 end
