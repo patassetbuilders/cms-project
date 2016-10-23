@@ -7,19 +7,28 @@ require "pry"
 require "pry-byebug"
 
 #blogg http://cms-project.blogspot.com.au/
-
 configure do
   enable :sessions
   set :session_secret, 'cmc-secret'
   #set :erb, :escape_html => true
 end
 
-root = File.expand_path("..", __FILE__) #"/Users/Pat/code/Launch-School/cms-project"
+def data_path
+  if ENV["RACK_ENV"] == 'test'
+    File.expand_path("../test/data", __FILE__)
+  else
+    File.expand_path("../data", __FILE__)
+  end
+end
 
 get "/" do
-  cms_contents
+  pattern = File.join(data_path,"*")
+  @cms_files = Dir.glob(pattern).map do |path|
+    File.basename(path)
+  end
   erb :index
 end
+
 
 get "/:file_name" do
   if file_exists?
@@ -33,29 +42,30 @@ get "/:file_name" do
 end
 
 get "/:file_name/edit" do
-  file_path = root + "/data/" + params[:file_name]
+  file = File.join(data_path,params[:file_name])
   @file_name = params[:file_name]
-  @content = File.read(file_path)
+  @file_contents = File.read(file)
   
   erb :edit_file
 end
 
-
-def cms_contents
-  root = File.expand_path("..", __FILE__)
-  @contents = Dir.glob(root + "/data/*").map do |path|
-    File.basename(path)
-  end 
+post "/:file_name" do
+  file = File.join(data_path,params[:file_name])
+  File.write(file, params[:content])
+  session[:message] = "#{params[:file_name]} has been updated."
+  redirect "/"
 end
 
+
 def file_exists?
-  cms_contents.include? params[:file_name]
+  file = File.join(data_path,params[:file_name])
+  files = Dir.glob(File.join(data_path,"*"))
+  files.include?(file)
 end
 
 def retrieve_file_contents
-  root = File.expand_path("..", __FILE__) #"/Users/Pat/code/Launch-School/cms-project"
-  file_path = root + "/data/" + params[:file_name]
-  @file_contents = File.read(file_path)  #beware of long files
+  file = File.join(data_path,params[:file_name])
+  @file_contents = File.read(file)  #beware of long files
 end
 
 def render_file
