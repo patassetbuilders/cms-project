@@ -78,4 +78,24 @@ class AppTest < Minitest::Test
     assert_equal 200, last_response.status
     assert_includes last_response.body, "new content"
   end
+  
+  def test_new_document_form
+    get "/new"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<input"
+    assert_includes last_response.body, %q(<button type="submit") 
+  end
+  
+  def test_create_new_file
+    post "/create", :file_name => "my_new_file.txt"
+    
+    assert_equal 302, last_response.status
+    
+    get last_response["Location"]
+    assert_includes last_response.body, "File my_new_file.txt created"
+    
+    get "/"
+    assert_includes last_response.body, "my_new_file.txt"
+  end
+  
 end

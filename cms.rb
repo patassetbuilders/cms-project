@@ -29,6 +29,23 @@ get "/" do
   erb :index
 end
 
+get "/new" do
+  erb :new_file
+end
+
+post "/create" do
+  filename = params[:file_name].to_s
+  if filename.size == 0
+    session[:message] = "You must enter a file name"
+    status 422
+    erb :new_file
+  else
+    file_path = File.join(data_path,params[:file_name])
+    File.write(file_path, "")
+    session[:message] = "File #{filename} created"
+    redirect "/"
+  end
+end 
 
 get "/:file_name" do
   if file_exists?
