@@ -3,19 +3,13 @@
   <head>
     <title>CMS App</title>
     <meta charset="UTF-8">
-    <!--
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=PT+Sans">
-    <link rel="stylesheet" href="/stylesheets/whitespace-reset.css">
-    <link rel="stylesheet" href="/stylesheets/application.css">
-    <script src="/javascripts/jquery-2.1.4.js"></script>
-    <script src="/javascripts/application.js"></script>
-      -->
+    <link rel="stylesheet" type="text/css"  href="/stylesheets/cms.css"  />
   </head>
   <body>
     <header>
       <h4>CMS Project</h4>
       <% if session[:message] %>
-        <p> <%= session[:message] %> </p>
+        <p class="message"> <%= session[:message] %> </p>
       <% end %>
       <div class="actions">
         <%= yield_content :header_links %>

@@ -73,6 +73,8 @@ def render_file
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
     markdown.render(@file_contents)
   elsif params[:file_name].reverse.start_with?('.txt')
+    headers["Content-Type"] = "text/plain"
+    
     @file_contents
   end
 end

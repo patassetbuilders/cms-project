@@ -5,6 +5,9 @@
 <p>Files in the data directory</p>
 <ul>
   <% @cms_files.each do |file_name| %>
-    <li><a href="<%= file_name %>"><%= file_name %></a>  <a href="<%= file_name %>/edit">edit</a></li>
+    <li>
+      <a href="<%= file_name %>"><%= file_name %></a>
+      <a href="<%= file_name %>/edit">edit</a>
+    </li>
   <% end %>
 </ul>
