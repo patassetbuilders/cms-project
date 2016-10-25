@@ -9,6 +9,17 @@ body {
   background-color: #ffff00;
 }
 
+div {
+  padding: 5px;
+}
+
+
+label {
+  width: 250px;
+  text-align: right;
+  padding: 20px;
+}
+
 form.inline {
   display: inline;
 }

@@ -80,6 +80,27 @@ post "/:file_name" do
   redirect "/"
 end
 
+get "/user/signin" do
+  erb :signin
+end
+
+post "/user/authenticate" do
+  if params[:user_name].downcase == 'admin' && params[:password] == 'secret'
+    session[:user_name] = params[:user_name]
+    session[:message] = "Welcome to  CMS"
+    redirect "/"
+  else
+    session[:message] = "Invalid Credentials"
+    erb :signin
+  end
+end
+
+post "/user/signout" do
+  session.delete(:user_name)
+  session[:message] = "You have been signed out."
+  redirect "/"
+end
+
 
 def file_exists?
   file = File.join(data_path,params[:file_name])

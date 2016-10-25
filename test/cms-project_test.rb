@@ -108,5 +108,31 @@ class AppTest < Minitest::Test
     refute_includes last_response.body, "to_be_deleted.txt"
   end
   
+  def test_get_signin_form
+    get "/user/signin"
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, "<input"
+    assert_includes last_response.body, %q(<label for="user_name">User Name</label>)
+  end
+  
+  def test_successful_signin
+    post "/user/authenticate", :user_name => 'admin', :password => 'secret'
+    assert_equal 302, last_response.status 
+    get last_response["Location"]
+    assert_includes last_response.body, "Sign Out"
+    assert_includes last_response.body, "Welcome to  CMS"
+  end
+    
+  def test_invalid_password
+    post "/user/authenticate", :user_name => 'admin', :password => '6767'
+    assert_equal 200, last_response.status 
+    assert_includes last_response.body, "Invalid Credentials"
+  end
+  
+  def test_invalid_username
+    post "/user/authenticate", :user_name => 'adminee', :password => 'secret'
+    assert_equal 200, last_response.status 
+    assert_includes last_response.body, "Invalid Credentials"
+  end
   
 end
