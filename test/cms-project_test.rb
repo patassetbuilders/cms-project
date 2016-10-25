@@ -119,8 +119,8 @@ class AppTest < Minitest::Test
     post "/user/authenticate", :user_name => 'admin', :password => 'secret'
     assert_equal 302, last_response.status 
     get last_response["Location"]
-    assert_includes last_response.body, "Sign Out"
     assert_includes last_response.body, "Welcome to  CMS"
+    assert_equal 200, last_response.status 
   end
     
   def test_invalid_password
