@@ -98,4 +98,15 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, "my_new_file.txt"
   end
   
+  def test_delete_file
+    create_document("to_be_deleted.txt")
+    
+    post "to_be_deleted.txt/delete"
+    assert_equal 302, last_response.status
+    get last_response.body, "to_be_deleted.txt has been deleted"
+    get "/"
+    refute_includes last_response.body, "to_be_deleted.txt"
+  end
+  
+  
 end

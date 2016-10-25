@@ -8,6 +8,9 @@
     <li>
       <a href="<%= file_name %>"><%= file_name %></a>
       <a href="<%= file_name %>/edit">edit</a>
+      <form class="inline" method="post" action="<%= file_name %>/delete">
+        <button type="submit">Delete</button>
+      </form>
     </li>
   <% end %>
 </ul>
