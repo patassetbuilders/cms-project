@@ -88,12 +88,9 @@ class AppTest < Minitest::Test
   
   def test_create_new_file
     post "/create", :file_name => "my_new_file.txt"
-    
     assert_equal 302, last_response.status
-    
     get last_response["Location"]
     assert_includes last_response.body, "File my_new_file.txt created"
-    
     get "/"
     assert_includes last_response.body, "my_new_file.txt"
   end
