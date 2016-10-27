@@ -27,6 +27,18 @@ class AppTest < Minitest::Test
     end
   end
   
+  def session
+    last_request.env["rack.session"]
+  end
+  
+  def signin_user #this is one way, the other is to set the rack.session see admin_session method 
+    post "/user/signin", :user_name => "admin", :password => "secret"
+  end
+  
+  def admin_session
+    {"rack.session" => {:user_name => "admin" } }
+  end
+  
   
   def test_index
     create_document "about.md"
@@ -48,59 +60,63 @@ class AppTest < Minitest::Test
   
   def test_document_not_found
     get "/notafile.ext"
-    
     assert_equal 302, last_response.status
-    
-    get last_response["Location"]
-
-    assert_equal 200, last_response.status
-    assert_includes last_response.body, "notafile.ext does not exist"
+    assert_equal "notafile.ext does not exist.", session[:message]
   end
   
   def test_editing_document
     create_document "changes.txt"
-    get "/changes.txt/edit"
+    #signin_user
+    get "/changes.txt/edit",{}, admin_session
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<textarea"
     assert_includes last_response.body, %q(<button type="submit")
   end
   
   def test_upddating_document
+    signin_user
     post "/changes.txt", content: "new content"
     assert_equal 302, last_response.status
+    assert_equal "changes.txt has been updated.", session[:message]
     
-    get last_response["Location"]
-  
-    
-    assert_includes last_response.body, "changes.txt has been updated"
-
     get  "/changes.txt"
     assert_equal 200, last_response.status
     assert_includes last_response.body, "new content"
   end
   
   def test_new_document_form
-    get "/new"
+    signin_user
+    get "/new"#, {}, admin_session
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<input"
     assert_includes last_response.body, %q(<button type="submit") 
   end
   
   def test_create_new_file
-    post "/create", :file_name => "my_new_file.txt"
+    signin_user
+    post "/create", {:file_name => "my_new_file.txt"},  admin_session
     assert_equal 302, last_response.status
-    get last_response["Location"]
+    assert_equal "File my_new_file.txt created", session[:message]
+    
+    # alternatively running the redirect
+    get last_response["Location"] #runs the redirect
     assert_includes last_response.body, "File my_new_file.txt created"
+    
+    #running index to check that the new file is in the index
     get "/"
     assert_includes last_response.body, "my_new_file.txt"
   end
   
   def test_delete_file
     create_document("to_be_deleted.txt")
-    
-    post "to_be_deleted.txt/delete"
+    signin_user
+    post "to_be_deleted.txt/delete"#, {}, admin_session 
     assert_equal 302, last_response.status
+    assert_equal "to_be_deleted.txt has been deleted", session[:message]
+    
     get last_response.body, "to_be_deleted.txt has been deleted"
+    
+    #checking that the file nolonger exists
     get "/"
     refute_includes last_response.body, "to_be_deleted.txt"
   end
@@ -113,23 +129,30 @@ class AppTest < Minitest::Test
   end
   
   def test_successful_signin
-    post "/user/authenticate", :user_name => 'admin', :password => 'secret'
+    post "/user/signin", :user_name => 'admin', :password => 'secret'
     assert_equal 302, last_response.status 
     get last_response["Location"]
     assert_includes last_response.body, "Welcome to  CMS"
     assert_equal 200, last_response.status 
   end
+  
+  def test_successful_signin_alternate #using the rack env  
+    post "/user/signin", :user_name => 'admin', :password => 'secret'
+    assert_equal 302, last_response.status 
+    assert_equal 'admin', session[:user_name]
+    assert_equal "Welcome to  CMS", session[:message]
+  end
     
   def test_invalid_password
-    post "/user/authenticate", :user_name => 'admin', :password => '6767'
+    post "/user/signin", :user_name => 'admin', :password => '6767'
     assert_equal 200, last_response.status 
-    assert_includes last_response.body, "Invalid Credentials"
+    assert_equal "Invalid Credentials", session[:message]
   end
   
   def test_invalid_username
-    post "/user/authenticate", :user_name => 'adminee', :password => 'secret'
+    post "/user/signin", :user_name => 'adminee', :password => 'secret'
     assert_equal 200, last_response.status 
-    assert_includes last_response.body, "Invalid Credentials"
+    assert_equal "Invalid Credentials", session[:message]
   end
   
 end

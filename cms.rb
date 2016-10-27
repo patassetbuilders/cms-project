@@ -30,20 +30,30 @@ get "/" do
 end
 
 get "/new" do
-  erb :new_file
+  if !signedin_user?
+    session[:message] = 'You must be signed in to do that'
+    redirect "/"
+  else
+    erb :new_file
+  end
 end
 
 post "/create" do
-  filename = params[:file_name].to_s
-  if filename.size == 0
-    session[:message] = "You must enter a file name"
-    status 422
-    erb :new_file
-  else
-    file_path = File.join(data_path,params[:file_name])
-    File.write(file_path, "")
-    session[:message] = "File #{filename} created"
+  if !signedin_user?
+    session[:message] = "You need to be signed in to do that"
     redirect "/"
+  else
+    filename = params[:file_name].to_s
+    if filename.size == 0
+      session[:message] = "You must enter a file name"
+      status 422
+      erb :new_file
+    else
+      file_path = File.join(data_path,params[:file_name])
+      File.write(file_path, "")
+      session[:message] = "File #{filename} created"
+      redirect "/"
+    end
   end
 end 
 
@@ -59,32 +69,47 @@ get "/:file_name" do
 end
 
 get "/:file_name/edit" do
-  file = File.join(data_path,params[:file_name])
-  @file_name = params[:file_name]
-  @file_contents = File.read(file)
+  if !signedin_user?
+    session[:message] = 'You must be signed om to do that.'
+    redirect "/"
+  else
+    file = File.join(data_path,params[:file_name])
+    @file_name = params[:file_name]
+    @file_contents = File.read(file)
   
-  erb :edit_file
+    erb :edit_file
+  end
 end
 
 post "/:file_name/delete" do
-  file_path = File.join(data_path,params[:file_name])
-  File.delete(file_path)
-  session[:message] = "#{params[:file_name]} has been deleted"
-  redirect "/"
+  if !signedin_user?
+    session[:message] = 'You must be signed om to do that.'
+    redirect "/"
+  else
+    file_path = File.join(data_path,params[:file_name])
+    File.delete(file_path)
+    session[:message] = "#{params[:file_name]} has been deleted"
+    redirect "/"
+  end
 end
 
 post "/:file_name" do
-  file = File.join(data_path,params[:file_name])
-  File.write(file, params[:content])
-  session[:message] = "#{params[:file_name]} has been updated."
-  redirect "/"
+  if !signedin_user?
+    session[:message] = 'You must be signed om to do that.'
+    redirect "/"
+  else
+    file = File.join(data_path,params[:file_name])
+    File.write(file, params[:content])
+    session[:message] = "#{params[:file_name]} has been updated."
+    redirect "/"
+  end
 end
 
 get "/user/signin" do
   erb :signin
 end
 
-post "/user/authenticate" do
+post "/user/signin" do
   if params[:user_name].downcase == 'admin' && params[:password] == 'secret'
     session[:user_name] = params[:user_name]
     session[:message] = "Welcome to  CMS"
@@ -119,7 +144,10 @@ def render_file
     markdown.render(@file_contents)
   elsif params[:file_name].reverse.start_with?('.txt')
     headers["Content-Type"] = "text/plain"
-    
     @file_contents
-  end
+  end 
+end
+
+def signedin_user? 
+  session[:user_name]
 end
