@@ -70,7 +70,7 @@ end
 
 get "/:file_name/edit" do
   if !signedin_user?
-    session[:message] = 'You must be signed om to do that.'
+    session[:message] = 'You must be signed in to do that.'
     redirect "/"
   else
     file = File.join(data_path,params[:file_name])
@@ -83,7 +83,7 @@ end
 
 post "/:file_name/delete" do
   if !signedin_user?
-    session[:message] = 'You must be signed om to do that.'
+    session[:message] = 'You must be signed in to do that.'
     redirect "/"
   else
     file_path = File.join(data_path,params[:file_name])
@@ -95,7 +95,7 @@ end
 
 post "/:file_name" do
   if !signedin_user?
-    session[:message] = 'You must be signed om to do that.'
+    session[:message] = 'You must be signed in to do that.'
     redirect "/"
   else
     file = File.join(data_path,params[:file_name])

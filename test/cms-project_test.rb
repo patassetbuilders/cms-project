@@ -66,6 +66,12 @@ class AppTest < Minitest::Test
   
   def test_editing_document
     create_document "changes.txt"
+    
+    # user not signed in
+    get "/changes.txt/edit"
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
+    
     #signin_user
     get "/changes.txt/edit",{}, admin_session
     assert_equal 200, last_response.status
@@ -74,6 +80,12 @@ class AppTest < Minitest::Test
   end
   
   def test_upddating_document
+    # user not signed in
+    post "/changes.txt", content: "new content"
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
+    
+    # user signed in
     signin_user
     post "/changes.txt", content: "new content"
     assert_equal 302, last_response.status
@@ -85,15 +97,26 @@ class AppTest < Minitest::Test
   end
   
   def test_new_document_form
+    #user not signed in
+    get "/new"
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that", session[:message]
+    
+    #user signed in
     signin_user
-    get "/new"#, {}, admin_session
+    get "/new"
     assert_equal 200, last_response.status
     assert_includes last_response.body, "<input"
     assert_includes last_response.body, %q(<button type="submit") 
   end
   
   def test_create_new_file
-    signin_user
+    # user not signed in
+    post "/create", :file_name => "my_new_file.txt"
+    assert_equal 302, last_response.status
+    assert_equal "You need to be signed in to do that", session[:message]
+    
+    # user signed in
     post "/create", {:file_name => "my_new_file.txt"},  admin_session
     assert_equal 302, last_response.status
     assert_equal "File my_new_file.txt created", session[:message]
@@ -109,12 +132,16 @@ class AppTest < Minitest::Test
   
   def test_delete_file
     create_document("to_be_deleted.txt")
-    signin_user
-    post "to_be_deleted.txt/delete"#, {}, admin_session 
+    
+    #user not signed in
+    post "to_be_deleted.txt/delete"
+    assert_equal 302, last_response.status
+    assert_equal "You must be signed in to do that.", session[:message]
+    
+    #user signed in
+    post "to_be_deleted.txt/delete", {}, admin_session
     assert_equal 302, last_response.status
     assert_equal "to_be_deleted.txt has been deleted", session[:message]
-    
-    get last_response.body, "to_be_deleted.txt has been deleted"
     
     #checking that the file nolonger exists
     get "/"
