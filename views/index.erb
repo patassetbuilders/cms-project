@@ -1,7 +1,3 @@
-<% if session[:message] %>
-  <p><%= session.delete(:message) %></p>
-<% end %>
-
 <p>Files in the data directory</p>
 <ul>
   <% @cms_files.each do |file_name| %>

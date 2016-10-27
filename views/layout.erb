@@ -11,6 +11,7 @@
       <% if session[:message] %>
         <p class="message"> <%= session[:message] %> </p>
       <% end %>
+      <% session.delete(:message) if session[:message] %>
       <div class="actions">
         <%= yield_content :header_links %>
       </div>
