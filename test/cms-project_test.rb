@@ -32,13 +32,12 @@ class AppTest < Minitest::Test
   end
   
   def signin_user #this is one way, the other is to set the rack.session see admin_session method 
-    post "/user/signin", :user_name => "admin", :password => "secret"
+    post "/user/signin", :user_name => "bill", :password => "billspassword"
   end
   
   def admin_session
     {"rack.session" => {:user_name => "admin" } }
   end
-  
   
   def test_index
     create_document "about.md"
@@ -156,7 +155,7 @@ class AppTest < Minitest::Test
   end
   
   def test_successful_signin
-    post "/user/signin", :user_name => 'admin', :password => 'secret'
+    post "/user/signin", :user_name => 'bill', :password => 'billspassword'
     assert_equal 302, last_response.status 
     get last_response["Location"]
     assert_includes last_response.body, "Welcome to  CMS"
@@ -164,9 +163,9 @@ class AppTest < Minitest::Test
   end
   
   def test_successful_signin_alternate #using the rack env  
-    post "/user/signin", :user_name => 'admin', :password => 'secret'
+    post "/user/signin", :user_name => 'bill', :password => 'billspassword'
     assert_equal 302, last_response.status 
-    assert_equal 'admin', session[:user_name]
+    assert_equal 'bill', session[:user_name]
     assert_equal "Welcome to  CMS", session[:message]
   end
     

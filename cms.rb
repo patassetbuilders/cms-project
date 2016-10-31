@@ -5,6 +5,7 @@ require "tilt/erubis"
 require "redcarpet"
 require "pry"
 require "pry-byebug"
+require "yaml"
 
 #blogg http://cms-project.blogspot.com.au/
 configure do
@@ -18,6 +19,14 @@ def data_path
     File.expand_path("../test/data", __FILE__)
   else
     File.expand_path("../data", __FILE__)
+  end
+end
+
+def user_data_path
+  if ENV["RACK_ENV"] == 'test'
+    File.expand_path("../test", __FILE__)
+  else
+    File.expand_path("..", __FILE__)
   end
 end
 
@@ -110,7 +119,9 @@ get "/user/signin" do
 end
 
 post "/user/signin" do
-  if params[:user_name].downcase == 'admin' && params[:password] == 'secret'
+  user_credentials = File.join(user_data_path,"users.yaml")
+  user_data = YAML.load(File.read(user_credentials))
+  if user_data[params[:user_name]] == params[:password]
     session[:user_name] = params[:user_name]
     session[:message] = "Welcome to  CMS"
     redirect "/"
